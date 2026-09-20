@@ -27,6 +27,43 @@
         color: #111;
       }
 
+      /* Màn hình chào để kích hoạt nhạc */
+      #welcome-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.75);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        cursor: pointer;
+        transition: opacity 0.5s ease;
+      }
+
+      .welcome-box {
+        background: #fff;
+        padding: 30px 40px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        max-width: 90%;
+      }
+
+      .welcome-box h2 {
+        font-family: "Cinzel", serif;
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+        color: #801827;
+      }
+
+      .welcome-box p {
+        font-size: 0.85rem;
+        color: #555;
+      }
+
       .card-container {
         background-color: #ffffff;
         width: 100%;
@@ -92,13 +129,12 @@
         white-space: nowrap;
       }
 
-      /* ICON TRÁI TIM BAY NHẸ & NHẬN PHÁT NHẠC */
+      /* ICON TRÁI TIM */
       .heart-icon {
         position: relative;
         cursor: pointer;
         padding: 5px;
         transition: transform 0.2s ease;
-        /* Animation bay bổng nhẹ nhàng lên xuống */
         animation: floatUp 2.5s ease-in-out infinite alternate;
       }
 
@@ -111,29 +147,25 @@
         transition: all 0.3s ease;
       }
 
-      /* Khi di chuột vào hoặc khi đang phát nhạc */
       .heart-icon:hover svg,
       .heart-icon.playing svg {
         fill: #801827;
         transform: scale(1.15);
       }
 
-      /* Hiệu ứng đập nhẹ khi đang phát nhạc */
       .heart-icon.playing {
         animation: heartBeat 1.2s infinite alternate ease-in-out;
       }
 
-      /* Keyframes hiệu ứng bay bổng */
       @keyframes floatUp {
         0% {
           transform: translateY(0);
         }
         100% {
-          transform: translateY(-8px); /* Bay nhích lên 8px */
+          transform: translateY(-8px);
         }
       }
 
-      /* Keyframes hiệu ứng tim đập */
       @keyframes heartBeat {
         0% {
           transform: translateY(-6px) scale(1);
@@ -391,39 +423,17 @@
         opacity: 0.8;
         text-align: center;
       }
-
-      .overlay-buttons {
-        position: absolute;
-        right: 12px;
-        bottom: 12px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        z-index: 10;
-      }
-
-      .circle-icon-btn {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.25);
-        backdrop-filter: blur(8px);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-      }
-
-      .circle-icon-btn svg {
-        width: 18px;
-        height: 18px;
-        stroke: #000;
-        fill: none;
-        stroke-width: 2.2;
-      }
     </style>
   </head>
   <body>
+    <!-- Màn hình chào giúp kích hoạt trình phát nhạc theo chính sách trình duyệt -->
+    <div id="welcome-screen">
+      <div class="welcome-box">
+        <h2>10 Months With My Soulmate</h2>
+        <p>Bấm vào đây để mở thiệp và nghe nhạc nhé ❤️</p>
+      </div>
+    </div>
+
     <div class="card-container">
       <!-- 1. THANH CỘT BÊN TRÁI -->
       <div class="left-sidebar">
@@ -443,8 +453,8 @@
 
         <div class="vertical-title">Cảm ơn - Marzuz</div>
 
-        <!-- Icon trái tim nhấp nháy/bay nhẹ và phát nhạc khi click -->
-        <div class="heart-icon" id="heartMusicBtn" title="Click to play music">
+        <!-- Icon trái tim nhấp nháy/bay nhẹ và bật/tắt nhạc khi click -->
+        <div class="heart-icon" id="heartMusicBtn" title="Bật/Tắt nhạc">
           <svg viewBox="0 0 24 24">
             <path
               d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
@@ -531,23 +541,6 @@
             </div>
             <div class="mini-caption">first date (?)</div>
           </div>
-
-          <div class="overlay-buttons">
-            <div class="circle-icon-btn">
-              <svg viewBox="0 0 24 24">
-                <polyline points="15 3 21 3 21 9"></polyline>
-                <polyline points="9 21 3 21 3 15"></polyline>
-                <line x1="21" y1="3" x2="14" y2="10"></line>
-                <line x1="3" y1="21" x2="10" y2="14"></line>
-              </svg>
-            </div>
-            <div class="circle-icon-btn">
-              <svg viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -560,11 +553,31 @@
       />
     </audio>
 
-    <!-- SCRIPT BẬT / TẮT NHẠC KHI BẤM VÀO TRÁI TIM -->
+    <!-- SCRIPT XỬ LÝ TỰ ĐỘNG PHÁT NHẠC VÀ BẤM TRÁI TIM -->
     <script>
+      const welcomeScreen = document.getElementById("welcome-screen");
       const heartBtn = document.getElementById("heartMusicBtn");
       const bgMusic = document.getElementById("bgMusic");
 
+      // Khi người dùng bấm vào màn hình chào đầu tiên để vào xem thiệp
+      if (welcomeScreen && bgMusic) {
+        welcomeScreen.addEventListener("click", () => {
+          bgMusic
+            .play()
+            .then(() => {
+              heartBtn.classList.add("playing");
+            })
+            .catch((e) => console.log("Lỗi phát nhạc:", e));
+
+          // Ẩn màn hình chào đi mượt mà
+          welcomeScreen.style.opacity = "0";
+          setTimeout(() => {
+            welcomeScreen.style.display = "none";
+          }, 500);
+        });
+      }
+
+      // Bật/tắt nhạc khi bấm vào icon trái tim ở thanh bên trái
       if (heartBtn && bgMusic) {
         heartBtn.addEventListener("click", () => {
           if (bgMusic.paused) {
